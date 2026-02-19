@@ -1,57 +1,89 @@
-using UnityEngine;
-
+п»їusing UnityEngine;
+using System.Collections.Generic;
 public class Body : MonoBehaviour
 {
-    [Header("Параметры бокса")]
+    [Header("Box parameters")]
     public Vector3 size = Vector3.one;       
     public Vector3 center = Vector3.zero;
 
-    [Header("Физические свойства")]
+    [Header("Physics")]
     public float mass = 1f;
+    [Range(0,1)]public float dragCoefficient = 1f;
 
-    [Header("Состояние")]
+    [Header("Property")]
     public Vector3 linearVelocity;   
     public Vector3 angularVelocity;
+    public Vector3 acceleration;
 
-    [Header("Настройки коллизий")]
+    [Header("Collision settings")]
     public LayerMask collisionMask = -1;           
     public int maxIterations = 5;                   
     public float skinWidth = 0.01f;                  
     [Range(0f, 1f)] public float bounciness = 0f;
 
+    [field: SerializeField] public float volume { get; private set; }
+    [field: SerializeField] public float density { get; private set; }
+    public float height => transform.position.y;
+
+    private void OnEnable()
+    {
+        RecalculateLocalProperty();
+    }
+    private void OnValidate()
+    {
+        if (mass <= 0)
+            mass = 0.001f;
+        RecalculateLocalProperty();
+    }
+    public void RecalculateLocalProperty()
+    {
+        volume = size.x * size.y * size.z;
+        density = mass / volume;
+    }
+
     private void FixedUpdate()
     {
-        AddForce(Physics.gravity * mass);
+        Vector3 saveLinearVelocity = linearVelocity;
+        //F = pgv
+        AddForce(EnviromentSettings.GetDensity(height) * -EnviromentSettings.Gravity * volume);
 
+        //F = mg
+        AddForce(EnviromentSettings.Gravity * mass);
 
-
-        // Вращаем объект (без проверки коллизий при вращении)
+        ///<summary>
+        ///F = (1/2) * Cx * ПЃ * S * VВІ
+        ///Р“РґРµ:
+        ///F вЂ” СЃРёР»Р° СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёСЏ РІРѕР·РґСѓС…Р°(РІ РќСЊСЋС‚РѕРЅР°С…).
+        ///Cx вЂ” РєРѕСЌС„С„РёС†РёРµРЅС‚ Р»РѕР±РѕРІРѕРіРѕ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёСЏ(Р°СЌСЂРѕРґРёРЅР°РјРёС‡РµСЃРєРёР№ РєРѕСЌС„С„РёС†РёРµРЅС‚).Р­С‚Рѕ Р±РµР·СЂР°Р·РјРµСЂРЅР°СЏ РІРµР»РёС‡РёРЅР°, РєРѕС‚РѕСЂР°СЏ Р·Р°РІРёСЃРёС‚ С‚РѕР»СЊРєРѕ РѕС‚ С„РѕСЂРјС‹ РѕР±СЉРµРєС‚Р° Рё РµРіРѕ РѕСЂРёРµРЅС‚Р°С†РёРё РІ РїРѕС‚РѕРєРµ .
+        ///ПЃ(СЂРѕ) вЂ” РїР»РѕС‚РЅРѕСЃС‚СЊ РІРѕР·РґСѓС…Р°(РІ РєРі/ РјВі). РџСЂРё РЅРѕСЂРјР°Р»СЊРЅС‹С… СѓСЃР»РѕРІРёСЏС…(РЅР° СѓСЂРѕРІРЅРµ РјРѕСЂСЏ, РїСЂРё С‚РµРјРїРµСЂР°С‚СѓСЂРµ РѕРєРѕР»Рѕ + 15В°C) РѕРЅР° СЃРѕСЃС‚Р°РІР»СЏРµС‚ РїСЂРёРјРµСЂРЅРѕ 1,2 вЂ” 1,225 РєРі / РјВі .
+        ///S вЂ” РїР»РѕС‰Р°РґСЊ РјРёРґРµР»РµРІР° СЃРµС‡РµРЅРёСЏ(РІ РјВІ).Р­С‚Рѕ РїР»РѕС‰Р°РґСЊ РїСЂРѕРµРєС†РёРё РІР°С€РµРіРѕ РєСѓР±Р° РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ, РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂРЅСѓСЋ РЅР°РїСЂР°РІР»РµРЅРёСЋ РґРІРёР¶РµРЅРёСЏ . Р”Р»СЏ РєСѓР±Р°, РґРІРёР¶СѓС‰РµРіРѕСЃСЏ РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂРЅРѕ СЃРІРѕРµР№ РіСЂР°РЅРё, СЌС‚Рѕ Р±СѓРґРµС‚ РїСЂРѕСЃС‚Рѕ РїР»РѕС‰Р°РґСЊ СЌС‚РѕР№ РіСЂР°РЅРё: S = aВІ, РіРґРµ a вЂ” РґР»РёРЅР° СЂРµР±СЂР° РєСѓР±Р°.
+        ///V вЂ” СЃРєРѕСЂРѕСЃС‚СЊ РґРІРёР¶РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РІРѕР·РґСѓС…Р°(РІ Рј / СЃ).РћР±СЂР°С‚РёС‚Рµ РІРЅРёРјР°РЅРёРµ, С‡С‚Рѕ СЃРєРѕСЂРѕСЃС‚СЊ Р±РµСЂРµС‚СЃСЏ РІ РєРІР°РґСЂР°С‚Рµ.
+        ///<summary>
+        Vector3 v_ot = linearVelocity - (EnviromentSettings.WindDirection * Vector3.forward * EnviromentSettings.WindSpeed);
+        AddForce(-0.5f * dragCoefficient 
+            * EnviromentSettings.GetDensity(height) 
+            * GeometryUtils.ComputeBoxProjectedArea(size, transform.rotation, EnviromentSettings.WindDirection) 
+            * v_ot.sqrMagnitude 
+            * v_ot.normalized);
+        
         if (angularVelocity != Vector3.zero)
             transform.Rotate(angularVelocity * Time.fixedDeltaTime, Space.World);
 
-        // Выталкиваем из начальных перекрытий (если есть)
         ResolveOverlaps();
 
-        // Вычисляем желаемое линейное перемещение
         Vector3 movement = linearVelocity * Time.fixedDeltaTime;
 
-        // Обрабатываем столкновения и получаем скорректированное перемещение
         Vector3 correctedMovement = ResolveCollisions(movement);
 
-        // Двигаем объект
         transform.position += correctedMovement;
 
-        // Обновляем линейную скорость в соответствии с фактическим перемещением
         if (correctedMovement != movement)
         {
             linearVelocity = correctedMovement / Time.fixedDeltaTime;
         }
+        acceleration = (linearVelocity - saveLinearVelocity) / Time.fixedDeltaTime;
     }
 
-    /// <summary>
-    /// Выталкивание из перекрытий с другими коллайдерами в начальный момент.
-    /// Используется простой алгоритм: смещение по направлению от ближайшей точки.
-    /// </summary>
     private void ResolveOverlaps()
     {
         Vector3 worldCenter = transform.TransformPoint(center);
@@ -61,20 +93,15 @@ public class Body : MonoBehaviour
         Collider[] overlaps = Physics.OverlapBox(worldCenter, halfExtents, rotation, collisionMask);
         if (overlaps.Length == 0) return;
 
-        // Находим ближайшую точку на поверхности бокса для разрешения перекрытия
-        // В реальном проекте стоит реализовать более аккуратный алгоритм,
-        // но для демонстрации используем простое смещение в сторону от центра масс перекрытий.
         Vector3 depenetration = Vector3.zero;
         foreach (var col in overlaps)
         {
-            // Ближайшая точка на коллайдере к центру нашего бокса
             Vector3 closestPoint = col.ClosestPoint(worldCenter);
             Vector3 direction = worldCenter - closestPoint;
             float distance = direction.magnitude;
             if (distance < 0.0001f) continue;
 
-            // Требуемое смещение, чтобы устранить перекрытие (зазор skinWidth)
-            float overlapDistance = halfExtents.magnitude - distance; // грубое приближение
+            float overlapDistance = halfExtents.magnitude - distance;
             depenetration += direction.normalized * overlapDistance;
         }
 
@@ -84,10 +111,6 @@ public class Body : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Выполняет непрерывную проверку столкновений (BoxCast) и корректирует перемещение
-    /// с учётом скольжения вдоль поверхностей.
-    /// </summary>
     private Vector3 ResolveCollisions(Vector3 movement)
     {
         Vector3 remainingMovement = movement;
@@ -104,7 +127,6 @@ public class Body : MonoBehaviour
 
             Vector3 moveDir = remainingMovement.normalized;
 
-            // Выполняем BoxCast
             if (Physics.BoxCast(worldCenter, halfExtents, moveDir, out RaycastHit hit, rotation, moveDistance, collisionMask))
             {
                 float safeDistance = Mathf.Max(0, hit.distance - skinWidth);
@@ -113,10 +135,8 @@ public class Body : MonoBehaviour
                 newPosition += moveToContact;
                 remainingMovement = moveDir * (moveDistance - safeDistance);
 
-                // Проецируем оставшееся перемещение на плоскость удара
                 remainingMovement = Vector3.ProjectOnPlane(remainingMovement, hit.normal);
 
-                // Применяем отскок
                 if (bounciness > 0)
                 {
                     Vector3 incomingVelocity = linearVelocity;
@@ -124,7 +144,6 @@ public class Body : MonoBehaviour
                     linearVelocity = Vector3.Lerp(incomingVelocity, reflected, bounciness);
                 }
 
-                // Обновляем центр и поворот для следующей итерации (позиция уже временно изменена)
                 transform.position = newPosition;
                 worldCenter = transform.TransformPoint(center);
                 rotation = transform.rotation;
@@ -139,9 +158,6 @@ public class Body : MonoBehaviour
         return newPosition - transform.position;
     }
 
-    /// <summary>
-    /// Визуализация бокса в редакторе.
-    /// </summary>
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -149,17 +165,14 @@ public class Body : MonoBehaviour
         Quaternion rotation = transform.rotation;
         Vector3 halfExtents = size * 0.5f;
 
-        // Рисуем каркасный куб
         Gizmos.matrix = Matrix4x4.TRS(worldCenter, rotation, Vector3.one);
         Gizmos.DrawWireCube(Vector3.zero, size);
-        Gizmos.matrix = Matrix4x4.identity; // сбрасываем
+        Gizmos.matrix = Matrix4x4.identity; 
     }
 
-    /// <summary>
-    /// Добавить линейную силу (учитывает массу).
-    /// </summary>
     public void AddForce(Vector3 force, ForceMode mode = ForceMode.Force)
     {
+        force += force;
         switch (mode)
         {
             case ForceMode.Force:
@@ -177,9 +190,6 @@ public class Body : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Добавить момент силы (угловое ускорение). Упрощённо (момент инерции = 1).
-    /// </summary>
     public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force)
     {
         switch (mode)
@@ -201,29 +211,14 @@ public class Body : MonoBehaviour
 
     public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
     {
-        // Центр масс (совпадает с центром бокса)
         Vector3 worldCenter = transform.TransformPoint(center);
-
-        // Вектор от центра масс до точки приложения
         Vector3 relativePosition = position - worldCenter;
-
-        // Момент силы
         Vector3 torque = Vector3.Cross(relativePosition, force);
-
-        // Добавляем линейную составляющую
         AddForce(force, mode);
-
-        // Добавляем момент
         AddTorque(torque, mode);
     }
 
-    /// <summary>
-    /// Установить линейную скорость.
-    /// </summary>
     public void SetLinearVelocity(Vector3 newVelocity) => linearVelocity = newVelocity;
 
-    /// <summary>
-    /// Установить угловую скорость.
-    /// </summary>
     public void SetAngularVelocity(Vector3 newAngularVelocity) => angularVelocity = newAngularVelocity;
 }
