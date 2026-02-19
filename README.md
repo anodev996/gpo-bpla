@@ -13,9 +13,9 @@
 4. Правила работы с репозиторием и ветками (ОБЯЗАТЕЛЬНО ЧИТАЕМ)
 5. \* Список всех команд
 
-## 1. Скачивание Git For Windows
+## 1. Скачивание и настройка Git For Windows
 
-Скачиваем сборку ***Git For Windows [[СКАЧАТЬ]](https://drive.google.com/file/d/1Z-KpbOlPzJq3uQU6l58Iei2_wLfjVaCd/view?usp=drive_link)***
+Скачиваем сборку **Git For Windows** [[СКАЧАТЬ]](https://drive.google.com/file/d/1Z-KpbOlPzJq3uQU6l58Iei2_wLfjVaCd/view?usp=drive_link)
 
 - Распаковываем архив
 - Делаем ярлык для запуска
@@ -26,16 +26,16 @@
 ```shell
 which git 
 # Вывод должен быть:
-> /mingw64/bin/git
+# > /mingw64/bin/git
 
 git --version
 # Вывод должен быть:
-> git version 2.53.0.windows.1
+# > git version 2.53.0.windows.1
 ```
 
 Если вывод совпал, начинаем первичную настройку.
 
-### Первичная настройка Git For Windows
+### Первичная настройка
 
 В первую очередь нужно задать имя и email. Email нужен чтобы GitHub отображал ваш аккаунт на странице репозитория (вкладка **Contributors**)
 
@@ -54,7 +54,7 @@ git config --global user.name && git config --global user.email
 
 ## 2. Настройка SSH для манипуляций с репозиторием на GitHub 
 
-Настраивать соединение с GitHub по SSH нужно чтобы иметь возможность работать с удаленным репозиторием через терминал. SSH ключ - это аналог связки `логин + пароль` в браузере, только для терминала.
+Настраивать соединение с GitHub по SSH необходимо, чтобы иметь возможность работать с удаленным репозиторием через терминал. SSH ключ - это аналог связки `логин + пароль` в браузере, только для терминала.
 
 Все просто, нужно будет:
 
@@ -70,35 +70,35 @@ git config --global user.name && git config --global user.email
 # Создаем новый ssh ключ.
 ssh-keygen -t ed25519
 
-> Enter file in which to save the key (/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519):
+# > Enter file in which to save the key (/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519):
 # Вопрос, какую директорию и название задать ключу.
 # По умолчанию, это С:\Users\<ИМЯ ПОЛЬЗОВАТЕЛЯ>\.ssh\id_ed25519.
 #
 # Жмем Enter, чтобы согласится на вариант по умолчанию.
 
-> Created directory '/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh'.
+# > Created directory '/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh'.
 # Если директории не было, она будет создана.
 
-> Enter passphrase for "/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519" (empty for no passphrase):
+# > Enter passphrase for "/c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519" (empty for no passphrase):
 # Вопрос, нужно ли зашифровать файл ключа (физически на диске)
 # на основе пароля. Лучше не шифровать, иначе придется вводить пароль 
 # при любой манипуляции с удаленными репозиториями.
 # 
 # Жмем Enter, чтобы отказаться от шифровки.
 
-> Enter same passphrase again:
+# > Enter same passphrase again:
 # Введите пароль снова. Мы его не вводили, жмем Enter.
 
-> Your identification has been saved in /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519
-> Your public key has been saved in /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519.pub
+# > Your identification has been saved in /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519
+# > Your public key has been saved in /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519.pub
 # Секретный и публичный ключи успешно созданы.
 ```
 
 На этапе создания ключа, может возникнуть сообщение вида:
 
 ```shell
-> /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519 already exists.
-> Overwrite (y/n)?
+# > /c/Users/<ИМЯ ПОЛЬЗОВАТЕЛЯ>/.ssh/id_ed25519 already exists.
+# > Overwrite (y/n)?
 # На компьютере уже был создан SSH ключ.
 # Перезаписать файл ключа?
 #
@@ -107,7 +107,7 @@ ssh-keygen -t ed25519
 
 ### Как скопировать содержимое публичного ключа
 
-Публичный ключ по умолчанию находится в директории `С:\Users\<username>\.ssh\` и имеет имя `id_ed25519.pub`.
+Публичный ключ по умолчанию находится в директории `С:\Users\<ИМЯ ПОЛЬЗОВАТЕЛЯ>\.ssh\` и имеет имя `id_ed25519.pub`.
 
 В этой же директории лежит другой файл, `id_ed25519` - это секретный ключ, его не трогаем, он нужен для SSH аутентификации.
 
@@ -124,7 +124,7 @@ start notepad "$HOME/.ssh/id_ed25519.pub"
 
 - **Title:** желательно назвать именем пользователя и хоста (отражает то, на какой машине и у какого пользователя хранится этот ключ), например `bubsage@dsk-win`.
 
-- **Key type:** `Autentification Key`.
+- **Key type:** выбираем `Autentification Key`.
 
 Вставляем публичный ключ в поле -> ***Add SSH key*** -> Вводим пароль от аккаунта для подтверждения.
 
@@ -136,17 +136,17 @@ start notepad "$HOME/.ssh/id_ed25519.pub"
 # Подключаемся к GitHub по SSH:
 ssh -T git@github.com
 
-> The authenticity of host 'github.com (140.82.121.4)' cant be established.
-> ED25519 key fingerprint is: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-> This key is not known by any other names.
-> Are you sure you want to continue connecting (yes/no/[fingerprint])?
+# > The authenticity of host 'github.com (140.82.121.4)' cant be established.
+# > ED25519 key fingerprint is: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
+# > This key is not known by any other names.
+# > Are you sure you want to continue connecting (yes/no/[fingerprint])?
 # Вкратце: наш комьютер не доверяет 'github.com (140.82.121.4)',
 # так как о нем нет записи в known_hosts.
 # 
 # Вводим 'yes', жмем Enter.
 
-> Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
-> Hi <ГИТХАБ ЛОГИН>! You've successfully authenticated, but GitHub does not provide shell access.
+# > Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+# > Hi <ГИТХАБ ЛОГИН>! You've successfully authenticated, but GitHub does not provide shell access.
 # Сообщение о том, что мы успешно авторизовались в свой аккаунт на GitHub по SSH.
 ```
 
