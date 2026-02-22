@@ -25,9 +25,20 @@ public class Body : MonoBehaviour
     [field: SerializeField] public float density { get; private set; }
     public float height => transform.position.y;
 
+    private ComponentBody[] components;
+
     private void OnEnable()
     {
         RecalculateLocalProperty();
+
+        components = GetComponentsInChildren<ComponentBody>();
+        for(int i = 0; i < components.Length;i++)
+            components[i].OnInit(this);
+    }
+    private void OnDisable()
+    {
+        for (int i = 0; i < components.Length; i++)
+            components[i].OnShutdown(this);
     }
     private void OnValidate()
     {
@@ -65,7 +76,11 @@ public class Body : MonoBehaviour
             * GeometryUtils.ComputeBoxProjectedArea(size, transform.rotation, EnviromentSettings.WindDirection) 
             * v_ot.sqrMagnitude 
             * v_ot.normalized);
-        
+
+        ///Обновляем компоненты чтобы учесть силы действующие от них
+        for (int i = 0; i < components.Length; i++)
+            components[i].OnUpdate(this);
+
         if (angularVelocity != Vector3.zero)
             transform.Rotate(angularVelocity * Time.fixedDeltaTime, Space.World);
 
