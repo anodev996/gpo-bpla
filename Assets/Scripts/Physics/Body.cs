@@ -32,7 +32,7 @@ public class Body : MonoBehaviour
 
     public Vector3 size => collider.size;
     public Vector3 center => collider.center;
-
+    public Vector3 worldSpaceCenter => rigidbody.worldCenterOfMass;
     private void OnEnable()
     {
         RecalculateLocalProperty();

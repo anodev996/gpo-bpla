@@ -15,9 +15,12 @@ public class Wing : ComponentBody
     /// </summary>
     public float radius = 0.2529f;
     /// <summary>
-    /// максимальная частота
+    /// Площадь
     /// </summary>
-    public int maxFrequency = 4000;
+    public float square = 0.0108f;
+    /// <summary>
+    /// Частота 
+    /// </summary>
     public float frequency = 0;
     /// <summary>
     /// Коэффициент подъемной силы профиля лопасти
@@ -43,16 +46,18 @@ public class Wing : ComponentBody
     /// Коэффициент заполнения(≈0.85). Учитывает затенение втулкой и комлями лопастей
     /// </summary>
     public float fillFactorCoefficient = 0.85f;
+
+    public float angularVelocity;
     [Space]
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[] visualizeWinds;
     /// <summary>
-    /// Ометаемая площадь
+    /// Фактор заполненая диск 
     /// </summary>
     /// <returns></returns>
-    public float GetSwerptSquare()
+    public float DiskFillFactor()
     {
-        return (0.1f * Mathf.PI * Mathf.Pow(GetDiameter(), 2)) / (4 * count);
+        return (4 * count * square) / (Mathf.PI * Mathf.Pow(GetDiameter(), 2));
     }
     public float GetDiameter()
     {
@@ -108,15 +113,41 @@ public class Wing : ComponentBody
         obj.transform.localRotation = Quaternion.Euler(0, angle, 0);
         obj.transform.localScale = new Vector3(scale, scale, scale);
         return obj;
-    }    
+    }  
+    /// <summary>
+    /// Безразмерная величина зависящая от формы лопасти
+    /// </summary>
+    /// <returns></returns>
+    public float GetCT()
+    {
+        return GetBladeCountCoef() * GetBladeProfileCoef() * integralCoefficient * twistRatioCoefficient * fillFactorCoefficient;
+    }
     public override void OnUpdate(Body body)
     {
-        for(int i = 0; i < count;i++)
+        // Визуализация вращения
+        float rotationSpeed = 2 * Mathf.PI * frequency; // рад/с
+        float angleStep = rotationSpeed * Time.fixedDeltaTime * Mathf.Rad2Deg;
+        for (int i = 0; i < count; i++)
         {
-            visualizeWinds[i].transform.Rotate(0, 2 * Mathf.PI * frequency, 0);
+            visualizeWinds[i].transform.Rotate(0, angleStep, 0);
         }
-        body.AddForceAtPosition(3f * GetBladeCountCoef() * GetBladeProfileCoef() * screwPitch * (Mathf.Pow(GetDiameter(), 4) / count) * integralCoefficient * twistRatioCoefficient * fillFactorCoefficient * frequency * transform.up
-                                ,transform.position);
+
+        // Расчёт силы тяги
+        float density = EnviromentSettings.GetDensity(body.height);
+        float D = GetDiameter();
+        float Ct = GetCT(); // комбинация коэффициентов
+        float sigma = DiskFillFactor(); // (4*count*square)/(π*D²)
+        float pitchRatio = screwPitch / D;
+
+        float F_mag = 0.5f * Ct * sigma * density * pitchRatio * Mathf.Pow(D, 4) * Mathf.Pow(frequency, 2);
+        Vector3 Ft = F_mag * transform.up; 
+
+        body.AddForceAtPosition(Ft, transform.position);
+
+        float reactiveFactor = 0.08f;
+        float M_reac_mag = reactiveFactor * F_mag * D;
+        Vector3 M_reac = Mathf.Sign(frequency) * transform.up * M_reac_mag;
+        body.AddTorque(M_reac);
     }
 
     [System.Serializable]
