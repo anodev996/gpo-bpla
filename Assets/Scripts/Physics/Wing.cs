@@ -131,7 +131,7 @@ public class Wing : ComponentBody
         /// </summary>
         FlatConvex,
         /// <summary>
-        /// Bicovex
+        /// Двувыпуклый
         /// </summary>
         Biconvex
     }
