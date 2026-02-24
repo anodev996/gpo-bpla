@@ -46,11 +46,15 @@ public class Wing : ComponentBody
     /// Коэффициент заполнения(≈0.85). Учитывает затенение втулкой и комлями лопастей
     /// </summary>
     public float fillFactorCoefficient = 0.85f;
-
-    public float angularVelocity;
     [Space]
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[] visualizeWinds;
+    [Header("Runtime")]
+    [field: SerializeField]public float angularVelocity { get; private set; }
+    /// <summary>
+    /// Сила которую создает пропеллер
+    /// </summary>
+    [field: SerializeField]public float Fmagnitude { get; private set; }   
     /// <summary>
     /// Фактор заполненая диск 
     /// </summary>
@@ -124,7 +128,6 @@ public class Wing : ComponentBody
     }
     public override void OnUpdate(Body body)
     {
-        // Визуализация вращения
         float rotationSpeed = 2 * Mathf.PI * frequency; // рад/с
         float angleStep = rotationSpeed * Time.fixedDeltaTime * Mathf.Rad2Deg;
         for (int i = 0; i < count; i++)
@@ -132,20 +135,17 @@ public class Wing : ComponentBody
             visualizeWinds[i].transform.Rotate(0, angleStep, 0);
         }
 
-        // Расчёт силы тяги
         float density = EnviromentSettings.GetDensity(body.height);
         float D = GetDiameter();
         float Ct = GetCT(); // комбинация коэффициентов
         float sigma = DiskFillFactor(); // (4*count*square)/(π*D²)
         float pitchRatio = screwPitch / D;
-
-        float F_mag = 0.5f * Ct * sigma * density * pitchRatio * Mathf.Pow(D, 4) * Mathf.Pow(frequency, 2);
-        Vector3 Ft = F_mag * transform.up; 
-
+        Fmagnitude = 0.5f * Ct * sigma * density * pitchRatio * Mathf.Pow(D, 4) * Mathf.Pow(frequency, 2);
+        Vector3 Ft = Fmagnitude * transform.up; 
         body.AddForceAtPosition(Ft, transform.position);
 
         float reactiveFactor = 0.08f;
-        float M_reac_mag = reactiveFactor * F_mag * D;
+        float M_reac_mag = reactiveFactor * Fmagnitude * D;
         Vector3 M_reac = Mathf.Sign(frequency) * transform.up * M_reac_mag;
         body.AddTorque(M_reac);
     }
