@@ -72,3 +72,8 @@ crashlytics-build.properties
 # Exceptions
 !*.dll
 !*.obj
+
+
+# Custom ignore
+.vsconfig
+.vscode/
