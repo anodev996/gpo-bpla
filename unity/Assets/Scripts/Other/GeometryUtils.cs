@@ -2,6 +2,34 @@
 
 public static class GeometryUtils
 {
+    public static Vector3 GetPerpendicularPointOnLine(Vector3 lineA, Vector3 lineB, Vector3 point)
+    {
+        Vector3 lineVector = lineB - lineA;
+        float lineLengthSqr = lineVector.sqrMagnitude;
+
+        if (lineLengthSqr < Mathf.Epsilon)
+            return lineA;
+
+        float t = Vector3.Dot(point - lineA, lineVector) / lineLengthSqr;
+
+        return lineA + t * lineVector;
+    }
+
+    public static float GetDistanceToLine(Vector3 lineA, Vector3 lineB, Vector3 point)
+    {
+        Vector3 lineDir = lineB - lineA;
+        float lineLengthSqr = lineDir.sqrMagnitude;
+
+        if (lineLengthSqr < Mathf.Epsilon)
+            return Vector3.Distance(point, lineA);
+
+        float t = Vector3.Dot(point - lineA, lineDir) / lineLengthSqr;
+
+        Vector3 closestPoint = lineA + t * lineDir;
+
+        return Vector3.Distance(point, closestPoint);
+    }
+
     public static float ComputeBoxProjectedArea(Vector3 boxSize, Quaternion boxRotation, Quaternion windDirection)
     {
         Vector3 windDir = windDirection * Vector3.forward;

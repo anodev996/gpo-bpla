@@ -33,7 +33,7 @@ public class Body : MonoBehaviour
     public Vector3 size => collider.size;
     public Vector3 center => collider.center;
     public Vector3 worldSpaceCenter => rigidbody.worldCenterOfMass;
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         RecalculateLocalProperty();
         components = GetComponentsInChildren<ComponentBody>();
@@ -41,7 +41,7 @@ public class Body : MonoBehaviour
             components[i].OnInit(this);
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         for (int i = 0; i < components.Length; i++)
             components[i].OnShutdown(this);
@@ -59,8 +59,8 @@ public class Body : MonoBehaviour
         volume = size.x * size.y * size.z;
         density = mass / volume;
     }
-
-    private void FixedUpdate()
+    protected virtual void Update() { }
+    protected virtual void FixedUpdate()
     {
         Vector3 saveLinearVelocity = linearVelocity;
 
