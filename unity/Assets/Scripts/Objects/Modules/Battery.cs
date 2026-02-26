@@ -16,7 +16,7 @@ public class Battery : ControlledBodyModule
     /// Внутреннее сопротивление батарейки
     /// </summary>
     [field:SerializeField] public override float resistance { get; protected set; }
-    public override float voltage
+    public override float currentVoltage
     {
         get 
         {

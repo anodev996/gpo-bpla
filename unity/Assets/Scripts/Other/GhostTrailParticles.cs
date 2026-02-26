@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using TriInspector;
 using UnityEngine;
 
 
@@ -6,18 +7,16 @@ public class GhostTrailParticles : MonoBehaviour
 {
     [Header("Particle System")]
     public new ParticleSystem particleSystem;   // система частиц для эффекта
-
+    [RequiredGet(InParents = true)]public Wing wing;
     [Header("Пороги")]
     public float angleThreshold = 15f;
     public float angleDelta;
-    private Quaternion previousRotation;
 
     void Start()
     {
         if (particleSystem == null)
             particleSystem = GetComponent<ParticleSystem>();
         
-        previousRotation = transform.rotation;
     }
 
     void Update()
@@ -25,7 +24,9 @@ public class GhostTrailParticles : MonoBehaviour
         Vector3 currentPosition = transform.position;
         Quaternion currentRotation = transform.rotation;
 
-        angleDelta += Quaternion.Angle(previousRotation, currentRotation);
+        angleDelta += wing.angleStep;
+
+        Quaternion previousRotation = currentRotation * Quaternion.Euler(0,-angleDelta,0);
 
         bool thresholdReached = angleDelta >= angleThreshold;
 
@@ -41,7 +42,6 @@ public class GhostTrailParticles : MonoBehaviour
                 angleDelta -= angleThreshold; 
                 EmitParticle(currentPosition, interpolatedRot);
             }
-            previousRotation = currentRotation;
         }
     }
 

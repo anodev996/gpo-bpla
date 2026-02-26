@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using TriInspector;
+using UnityEditor.Rendering.Universal;
 using UnityEngine;
-
+using UnityEngine.Assertions.Must;
 /// <summary>
 /// Управляемое тело, это любое тело которым может управлять игрок,
 /// В нашей симуляции под такими телами подразумеваются обычно квадрокоптеры и (возможно) самолеты,
@@ -36,21 +38,15 @@ public abstract class ControlledBody : Body
     }
 
     #region Modules
-
-    private ControlledBodyModule[] СonvertersModules;
-    private ControlledBodyModule[] ProducersModules;
-
-    public float amperage { get; protected set; }
-    public float voltage {  get; protected set; }
-    public float resistance { get; protected set; }
+    [ShowInInspector][ReadOnly] private ControlledBodyModule[] СonvertersModules;
+    [ShowInInspector][ReadOnly] private ControlledBodyModule[] ProducersModules;
 
     public void CollectModules()
     {
         List<ControlledBodyModule> converters = new List<ControlledBodyModule>();
         List<ControlledBodyModule> producers = new List<ControlledBodyModule>();
 
-        var modules = GetComponents<ControlledBodyModule>().ToList();
-        modules.AddRange(GetComponentsInChildren<ControlledBodyModule>());
+        var modules = GetModules(transform);
 
         for (int i = 0; i < modules.Count;i++)
         {
@@ -68,7 +64,33 @@ public abstract class ControlledBody : Body
         СonvertersModules = converters.ToArray();
         ProducersModules = producers.ToArray();
     }
+    private List<ControlledBodyModule> GetModules(Transform root)
+    {
+        var result = new List<ControlledBodyModule>();
+        if (root == null)
+            return result;
 
+        // Используем очередь для обхода в ширину (итеративный подход, чтобы избежать глубокой рекурсии)
+        var queue = new Queue<Transform>();
+        queue.Enqueue(root);
+
+        while (queue.Count > 0)
+        {
+            Transform current = queue.Dequeue();
+            ControlledBodyModule component = current.GetComponent<ControlledBodyModule>();
+            if (component != null)
+                result.Add(component);
+            if (current.GetComponent<IConnection>() == null)
+            {
+                foreach (Transform child in current)
+                {
+                    queue.Enqueue(child);
+                }
+            }
+        }
+
+        return result;
+    }
     public void StartModules()
     {
         for(int i = 0;i < СonvertersModules.Length;i++)
@@ -96,25 +118,46 @@ public abstract class ControlledBody : Body
     public void UpdateModules()
     {
         //Clear
-        voltage = 0;
-        amperage = 0;
-        resistance = 0;
+        var Vbat = 0f;
+        var Ibat = 0f;
+        var Rbat = 0f;
         ///Все батарейки считаются парарельно соединенными
         for (int i = 0; i < ProducersModules.Length; i++)
         {
-            voltage += ProducersModules[i].voltage;
-            amperage += ProducersModules[i].amperage;
-            resistance += (1 / ProducersModules[i].resistance);
+            Vbat += ProducersModules[i].maxVoltage;
+            Ibat += ProducersModules[i].maxAmperage;
+            Rbat += (1 / ProducersModules[i].resistance);
         }
-        resistance = 1 / resistance;
+        Rbat = 1 / Rbat;
 
+        var Ic = 0f;
+        var Rc = 0f;
+        ///Все элементы цепи так же парарельно соединены
+        ///
+        ///Correction
         for (int i = 0; i < СonvertersModules.Length; i++)
         {
-            resistance += СonvertersModules[i].resistance;
+            ///если внутренние сопротивление слишком мало срабатывает защита и ток на цепь не подается 
+            if (СonvertersModules[i].resistance > 0.5f)
+            {
+                if (СonvertersModules[i].currentVoltage <= Vbat)
+                {
+                    СonvertersModules[i].currentAmperage = СonvertersModules[i].maxAmperage;
+                    СonvertersModules[i].currentVoltage = СonvertersModules[i].maxVoltage;
+                    Rc += (1 / СonvertersModules[i].resistance);
+                    Ic += СonvertersModules[i].currentAmperage;
+                }
+                else
+                {
+                    СonvertersModules[i].currentVoltage = Vbat;
+                    СonvertersModules[i].currentAmperage = Vbat / СonvertersModules[i].resistance;
+                    Rc += (1 / СonvertersModules[i].resistance);
+                }
+            }
         }
-        var needAmperage = voltage / resistance;
+        Rc = 1 / Rc;
 
-        Debug.Log($"V:{voltage} I:{amperage} R:{resistance} In{needAmperage}");
+        Debug.Log($"Vb:{Vbat} Ib:{Ibat} Rb:{Rbat} Ic{Ic} Rc{Rc}");
         for (int i = 0; i < СonvertersModules.Length; i++)
         {
             СonvertersModules[i].OnUpdate(this);

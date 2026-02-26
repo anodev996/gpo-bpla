@@ -1,60 +1,36 @@
 ﻿using System.Collections;
+using TriInspector;
 using UnityEngine;
 
-
+[DeclareTabGroup("Main")]
 public class Wing : ComponentBody
 {
     [Header("Основные параметры")]
-    public int count = 3;
-    /// <summary>
-    /// Модификация размера крыла от изначального
-    /// </summary>
-    public float scale = 1;
-    /// <summary>
-    /// Радиус крыла
-    /// </summary>
-    public float radius = 0.2529f;
-    /// <summary>
-    /// Площадь
-    /// </summary>
-    public float square = 0.0108f;
-    /// <summary>
-    /// Частота 
-    /// </summary>
-    public float frequency = 0;
-    /// <summary>
-    /// Коэффициент подъемной силы профиля лопасти
-    /// </summary>
-    public BladeProfile profile;
-    /// <summary>
-    /// Геометрический шаг винта (м). 
-    /// Важный параметр, показывающий, насколько винт "закручен". 
-    /// В простейшем случае для симуляции его можно принять пропорциональным диаметру: 
-    /// H = (шаг/диаметр) × D
-    /// </summary>
-    public float screwPitch = 0.5f;
+    [Group("Main"), Tab("Основные параметры")] public int count = 3;
+    [InfoBox("Модификация размера крыла от изначального")]
+    [Group("Main"), Tab("Основные параметры")] public float scale = 1;
+    [InfoBox("Радиус крыльев")]
+    [Group("Main"), Tab("Основные параметры")] public float radius = 0.2529f;
+    [Group("Main"), Tab("Основные параметры")] public float square = 0.0108f;
+    [Group("Main"), Tab("Основные параметры")] public float frequency = 0;
+    [Group("Main"), Tab("Основные параметры")] public BladeProfile profile;
+    [Group("Main"), Tab("Основные параметры")] public Direction direction;
+    [InfoBox("Геометрический шаг винта (м). \r\n Важный параметр, показывающий, насколько винт \"закручен\". \r\n В простейшем случае для симуляции его можно принять пропорциональным диаметру: \r\nH = (шаг/диаметр) × D")]
+    [Group("Main"), Tab("Основные параметры")] public float screwPitch = 0.5f;
     [Header("Коэфициенты")]
-    /// <summary>
-    /// Интегральный коэффициент (≈0.75). Учитывает, что тяга распределена по лопасти неравномерно
-    /// </summary>
-    public float integralCoefficient = 0.75f;
-    /// <summary>
-    /// Коэффициент крутки (≈0.95). Учитывает, что угол установки лопасти меняется по радиусу
-    /// </summary>
-    public float twistRatioCoefficient = 0.95f;
-    /// <summary>
-    /// Коэффициент заполнения(≈0.85). Учитывает затенение втулкой и комлями лопастей
-    /// </summary>
-    public float fillFactorCoefficient = 0.85f;
+    [InfoBox("Интегральный коэффициент. Учитывает, что тяга распределена по лопасти неравномерно")]
+    [Group("Main"), Tab("Коэфициенты")] public float integralCoefficient = 0.75f;
+    [InfoBox("Коэффициент крутки. Учитывает, что угол установки лопасти меняется по радиусу")]
+    [Group("Main"), Tab("Коэфициенты")] public float twistRatioCoefficient = 0.95f;
+    [InfoBox("Коэффициент заполнения. Учитывает затенение втулкой и комлями лопастей")]
+    [Group("Main"), Tab("Коэфициенты")] public float fillFactorCoefficient = 0.85f;
     [Space]
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[] visualizeWinds;
     [Header("Runtime")]
-    [field: SerializeField]public float angularVelocity { get; private set; }
-    /// <summary>
-    /// Сила которую создает пропеллер
-    /// </summary>
-    [field: SerializeField]public float Fmagnitude { get; private set; }   
+    [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float angularVelocity { get; private set; }
+    [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float Fmagnitude { get; private set; }
+    [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float angleStep {  get; private set; }
     /// <summary>
     /// Фактор заполненая диск 
     /// </summary>
@@ -115,7 +91,7 @@ public class Wing : ComponentBody
         obj.transform.parent = transform;
         obj.transform.localPosition = new Vector3(0, 0, 0);
         obj.transform.localRotation = Quaternion.Euler(0, angle, 0);
-        obj.transform.localScale = new Vector3(scale, scale, scale);
+        obj.transform.localScale = new Vector3(GetDirection() * scale, scale,GetDirection() * scale);
         return obj;
     }  
     /// <summary>
@@ -126,10 +102,21 @@ public class Wing : ComponentBody
     {
         return GetBladeCountCoef() * GetBladeProfileCoef() * integralCoefficient * twistRatioCoefficient * fillFactorCoefficient;
     }
+    public int GetDirection()
+    {
+        switch(direction)
+        {
+            default:
+            case Direction.Clockwise:
+                return 1;
+            case Direction.ReverseClockwise: 
+                return -1;
+        }
+    }
     public override void OnUpdate(Body body)
     {
         float rotationSpeed = 2 * Mathf.PI * frequency; // рад/с
-        float angleStep = rotationSpeed * Time.fixedDeltaTime * Mathf.Rad2Deg;
+        angleStep = rotationSpeed * Time.fixedDeltaTime * Mathf.Rad2Deg;
         for (int i = 0; i < count; i++)
         {
             visualizeWinds[i].transform.Rotate(0, angleStep, 0);
@@ -146,7 +133,7 @@ public class Wing : ComponentBody
 
         float reactiveFactor = 0.08f;
         float M_reac_mag = reactiveFactor * Fmagnitude * D;
-        Vector3 M_reac = Mathf.Sign(frequency) * transform.up * M_reac_mag;
+        Vector3 M_reac = GetDirection() * transform.up * M_reac_mag;
         body.AddTorque(M_reac);
     }
 
@@ -165,5 +152,9 @@ public class Wing : ComponentBody
         /// Двувыпуклый
         /// </summary>
         Biconvex
+    }
+    public enum Direction
+    {
+        Clockwise, ReverseClockwise
     }
 }
