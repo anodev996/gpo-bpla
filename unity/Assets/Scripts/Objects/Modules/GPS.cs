@@ -2,8 +2,7 @@
 using UnityEngine;
 
 
-public class GPS : MonoBehaviour
+public class GPS : ControlledBodyModule
 {
-
-
+    public override Type type => Type.Сonverter;
 }

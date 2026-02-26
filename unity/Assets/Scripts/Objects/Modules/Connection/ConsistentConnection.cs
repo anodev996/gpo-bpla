@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TriInspector;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 
 public class ConsistentConnection : ControlledBodyModule, IConnection
@@ -39,12 +40,14 @@ public class ConsistentConnection : ControlledBodyModule, IConnection
             m_resistance = value;
         }
     }
-
     public override float currentAmperage 
     {   
         get 
         {
-            return modules[0].currentAmperage;
+            float I = 0;
+            for (int i = 0; i < modules.Length; i++)
+                I += modules[i].currentAmperage;
+            return I / modules.Length;
         }
         set
         {

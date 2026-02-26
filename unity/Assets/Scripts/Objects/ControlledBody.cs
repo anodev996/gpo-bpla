@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using TriInspector;
-using UnityEditor.Rendering.Universal;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 /// <summary>
 /// Управляемое тело, это любое тело которым может управлять игрок,
 /// В нашей симуляции под такими телами подразумеваются обычно квадрокоптеры и (возможно) самолеты,
@@ -157,7 +154,12 @@ public abstract class ControlledBody : Body
         }
         Rc = 1 / Rc;
 
-        Debug.Log($"Vb:{Vbat} Ib:{Ibat} Rb:{Rbat} Ic{Ic} Rc{Rc}");
+        for (int i = 0; i < ProducersModules.Length; i++)
+        {
+            ProducersModules[i].currentAmperage = Ic / ProducersModules.Length;
+        }
+
+        //Debug.Log($"Vb:{Vbat} Ib:{Ibat} Rb:{Rbat} Ic{Ic} Rc{Rc} Uc{Ic * Rc}");
         for (int i = 0; i < СonvertersModules.Length; i++)
         {
             СonvertersModules[i].OnUpdate(this);

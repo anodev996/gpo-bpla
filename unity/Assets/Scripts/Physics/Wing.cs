@@ -5,7 +5,6 @@ using UnityEngine;
 [DeclareTabGroup("Main")]
 public class Wing : ComponentBody
 {
-    [Header("Основные параметры")]
     [Group("Main"), Tab("Основные параметры")] public int count = 3;
     [InfoBox("Модификация размера крыла от изначального")]
     [Group("Main"), Tab("Основные параметры")] public float scale = 1;
@@ -17,7 +16,6 @@ public class Wing : ComponentBody
     [Group("Main"), Tab("Основные параметры")] public Direction direction;
     [InfoBox("Геометрический шаг винта (м). \r\n Важный параметр, показывающий, насколько винт \"закручен\". \r\n В простейшем случае для симуляции его можно принять пропорциональным диаметру: \r\nH = (шаг/диаметр) × D")]
     [Group("Main"), Tab("Основные параметры")] public float screwPitch = 0.5f;
-    [Header("Коэфициенты")]
     [InfoBox("Интегральный коэффициент. Учитывает, что тяга распределена по лопасти неравномерно")]
     [Group("Main"), Tab("Коэфициенты")] public float integralCoefficient = 0.75f;
     [InfoBox("Коэффициент крутки. Учитывает, что угол установки лопасти меняется по радиусу")]
@@ -27,7 +25,6 @@ public class Wing : ComponentBody
     [Space]
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[] visualizeWinds;
-    [Header("Runtime")]
     [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float angularVelocity { get; private set; }
     [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float Fmagnitude { get; private set; }
     [Group("Main"), Tab("Runtime")][ShowInInspector][ReadOnly] public float angleStep {  get; private set; }
