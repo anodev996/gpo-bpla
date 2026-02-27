@@ -137,10 +137,10 @@ public abstract class ControlledBody : Body
             ///если внутренние сопротивление слишком мало срабатывает защита и ток на цепь не подается 
             if (СonvertersModules[i].resistance > 0.5f)
             {
-                if (СonvertersModules[i].currentVoltage <= Vbat)
+                if (СonvertersModules[i].needVoltage <= Vbat)
                 {
-                    СonvertersModules[i].currentAmperage = СonvertersModules[i].maxAmperage;
-                    СonvertersModules[i].currentVoltage = СonvertersModules[i].maxVoltage;
+                    СonvertersModules[i].currentAmperage = СonvertersModules[i].needAmperage;
+                    СonvertersModules[i].currentVoltage = СonvertersModules[i].needVoltage;
                     Rc += (1 / СonvertersModules[i].resistance);
                     Ic += СonvertersModules[i].currentAmperage;
                 }
@@ -149,6 +149,7 @@ public abstract class ControlledBody : Body
                     СonvertersModules[i].currentVoltage = Vbat;
                     СonvertersModules[i].currentAmperage = Vbat / СonvertersModules[i].resistance;
                     Rc += (1 / СonvertersModules[i].resistance);
+                    Ic += СonvertersModules[i].currentAmperage;
                 }
             }
         }
@@ -158,8 +159,6 @@ public abstract class ControlledBody : Body
         {
             ProducersModules[i].currentAmperage = Ic / ProducersModules.Length;
         }
-
-        //Debug.Log($"Vb:{Vbat} Ib:{Ibat} Rb:{Rbat} Ic{Ic} Rc{Rc} Uc{Ic * Rc}");
         for (int i = 0; i < СonvertersModules.Length; i++)
         {
             СonvertersModules[i].OnUpdate(this);

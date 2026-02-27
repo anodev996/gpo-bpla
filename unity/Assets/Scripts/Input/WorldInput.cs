@@ -28,12 +28,12 @@ public class WorldInput : MonoBehaviour
 
     public void Update()
     {
-        
         ///Обязательный инпут
         StandartInput();
     }
 
     #region Standart
+    public ControlledBody controlled { get; set; }
     private ControlledBody predBody;
     private float lastClickTime;
     public void StandartInput()

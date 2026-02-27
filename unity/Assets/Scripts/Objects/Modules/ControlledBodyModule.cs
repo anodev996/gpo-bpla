@@ -18,7 +18,22 @@ public abstract class ControlledBodyModule : MonoBehaviour
     /// </summary>
     [field: SerializeField] public virtual float maxVoltage { get; protected set; }
     public abstract Type type { get; }
-
+    [ReadOnly][ShowInInspector]public virtual float needAmperage
+    {
+        get
+        {
+            return maxAmperage;
+        }
+        set { }
+    }
+    public virtual float needVoltage
+    {
+        get
+        {
+            return needAmperage * resistance;
+        }
+        protected set { }
+    }
     public virtual float currentAmperage { get; set; }
     public virtual float currentVoltage { get; set; }
     /// <summary>
