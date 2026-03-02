@@ -10,6 +10,44 @@ public class WorldInput : MonoBehaviour
 {
     [SerializeField] private new Camera camera;
     [SerializeField] private CinemachineCamera[] cameras;
+    [SerializeField] private CinemachineCamera currentCamera;
+
+    public void ChangeCamera(CinemachineCamera camera)
+    {
+        currentCamera.gameObject.SetActive(false);
+        currentCamera = camera;
+        currentCamera.gameObject.SetActive(true);
+    }
+
+    public void OpenFreeCamera()
+    {
+        for(int i = 0; i < cameras.Length; i++)
+        {
+            if(cameras[i].TryGetComponent<FreeCamera>(out FreeCamera camera))
+            {
+                ChangeCamera(cameras[i]);
+                return;
+            }
+        }
+    }
+
+    public void Open3thCamera(ControlledBody body)
+    {
+        for (int i = 0; i < cameras.Length; i++)
+        {
+            if (cameras[i].TryGetComponent<CinemachineThirdPersonFollow>(out CinemachineThirdPersonFollow camera))
+            {
+                ChangeCamera(cameras[i]);
+                return;
+            }
+        }
+    }
+
+    public void EnterControlledBody(ControlledBody body)
+    {
+        controlled = body;
+        Open3thCamera(controlled);
+    }
 
     public Transform cameraTransform
     {
@@ -30,6 +68,12 @@ public class WorldInput : MonoBehaviour
     {
         ///Обязательный инпут
         StandartInput();
+
+        if(controlled != null)
+        {
+            controlled.direction = new Vector3(Input.GetAxis("Vertical"), Input.GetAxis("Jump"), Input.GetAxis("Horizontal"));
+            controlled.angle = Input.GetAxis("Rotation");
+        }
     }
 
     #region Standart
@@ -41,38 +85,49 @@ public class WorldInput : MonoBehaviour
         lastClickTime += Time.unscaledDeltaTime;
         if (Input.GetKeyDown(KeyCode.P))
             Time.timeScale = Time.timeScale == 0? 1 : 0;
-        if(MouseRaycast(out Vector3 origin,out RaycastHit hit))
+        if (controlled == null)
         {
-            bool isBreak = false;
-            foreach (var body in ControlledBody.bodies)
+            if (MouseRaycast(out Vector3 origin, out RaycastHit hit))
             {
-                var inputRadius = Mathf.Min(0.01f * Vector3.Distance(camera.transform.position, body.transform.position), body.inputRadius);
-                if(body.inputRadius >= GeometryUtils.GetDistanceToLine(origin, hit.point, body.transform.position))
+                bool isBreak = false;
+                foreach (var body in ControlledBody.bodies)
                 {
-                    if (body != predBody)
+                    var inputRadius = Mathf.Min(0.01f * Vector3.Distance(camera.transform.position, body.transform.position), body.inputRadius);
+                    if (body.inputRadius >= GeometryUtils.GetDistanceToLine(origin, hit.point, body.transform.position))
                     {
-                        predBody?.OnUpAim(this);
+                        if (body != predBody)
+                        {
+                            predBody?.OnUpAim(this);
 
-                        body.OnDownAim(this);
-                        predBody = body;
+                            body.OnDownAim(this);
+                            predBody = body;
+                        }
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            if (lastClickTime < 0.3f)
+                                body.OnDoubleClick(this);
+                            else
+                                body.OnClick(this);
+                            lastClickTime = 0;
+                        }
+                        isBreak = true;
+                        break;
                     }
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        if(lastClickTime < 0.3f)
-                            body.OnDoubleClick(this);
-                        else
-                            body.OnClick(this);
-                        lastClickTime = 0;
-                    }
-                    isBreak = true;
-                    break;
+                }
+                if (predBody != null && isBreak == false)
+                {
+                    predBody.OnUpAim(this);
+                    predBody = null;
                 }
             }
-            if(predBody != null && isBreak == false)
-            {
-                predBody.OnUpAim(this);
-                predBody = null;
-            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (controlled == null && predBody != null)
+                EnterControlledBody(predBody);
+            else if (controlled != null)
+                OpenFreeCamera();
         }
     }
     #endregion

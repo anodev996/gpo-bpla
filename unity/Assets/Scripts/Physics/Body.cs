@@ -1,19 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using TriInspector;
 
+[DeclareTabGroup("Main")]
 public class Body : MonoBehaviour
 {
-    [Header("Physics")]
-    [Range(0, 1)] public float dragCoefficient = 1f;
-    [SerializeField] private new BoxCollider collider;
-    [SerializeField] private new Rigidbody rigidbody;
-    [Header("Property")]
-    public Vector3 linearVelocity => rigidbody.linearVelocity;
-    public Vector3 angularVelocity => rigidbody.angularVelocity;
-    public Vector3 acceleration;
-
-    [field: SerializeField] public float volume { get; private set; }
-    [field: SerializeField] public float density { get; private set; }
+    [Group("Main"), Tab("Physics"), Range(0, 1)] public float dragCoefficient = 1f;
+    [Group("Main"), Tab("Physics"), SerializeField] private new BoxCollider collider;
+    [Group("Main"), Tab("Physics"), SerializeField] private new Rigidbody rigidbody;
+    [Group("Main"), Tab("Physics"), ReadOnly, ShowInInspector] public Vector3 linearVelocity => rigidbody.linearVelocity;
+    [Group("Main"), Tab("Physics"), ReadOnly, ShowInInspector] public Vector3 angularVelocity => rigidbody.angularVelocity;
+    [Group("Main"), Tab("Physics"), ReadOnly, ShowInInspector] public Vector3 acceleration { get; private set; }
+    [Group("Main"), Tab("Physics"), ShowInInspector] public float volume { get; private set; }
+    [Group("Main"), Tab("Physics"), ShowInInspector] public float density { get; private set; }
     public float height => transform.position.y;
 
     private ComponentBody[] components;

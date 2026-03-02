@@ -8,10 +8,10 @@ using UnityEngine;
 /// </summary>
 public abstract class ControlledBody : Body
 {
-    ///<summary>
-    /// Радиус от которого будет действовать WorldInput при неполном наведении
-    ///</summary>
-    [field: SerializeField] public float inputRadius { get; protected set; } = 2;
+    [InfoBox("Радиус от которого будет действовать WorldInput при неполном наведении")]
+    [ShowInInspector, Group("Main"), Tab("Controlled")] public float inputRadius { get; protected set; } = 2;
+    [ShowInInspector, Group("Main"), Tab("Controlled")] public Vector3 direction { get; set; }
+    [ShowInInspector, Group("Main"), Tab("Controlled")] public float angle { get; set;  }
     public static List<ControlledBody> bodies { get; protected set; } = new List<ControlledBody>();
 
     protected override void OnEnable()
@@ -35,8 +35,8 @@ public abstract class ControlledBody : Body
     }
 
     #region Modules
-    [ShowInInspector][ReadOnly] private ControlledBodyModule[] СonvertersModules;
-    [ShowInInspector][ReadOnly] private ControlledBodyModule[] ProducersModules;
+    [ShowInInspector, ReadOnly, Group("Main"), Tab("Controlled")] private ControlledBodyModule[] СonvertersModules;
+    [ShowInInspector, ReadOnly, Group("Main"), Tab("Controlled")] private ControlledBodyModule[] ProducersModules;
 
     public void CollectModules()
     {
