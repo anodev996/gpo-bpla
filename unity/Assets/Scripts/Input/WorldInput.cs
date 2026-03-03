@@ -46,6 +46,7 @@ public class WorldInput : MonoBehaviour
     public void EnterControlledBody(ControlledBody body)
     {
         controlled = body;
+        predBody = null;
         Open3thCamera(controlled);
     }
 
@@ -77,7 +78,7 @@ public class WorldInput : MonoBehaviour
     }
 
     #region Standart
-    public ControlledBody controlled { get; set; }
+    public ControlledBody controlled { get; set; } 
     private ControlledBody predBody;
     private float lastClickTime;
     public void StandartInput()
@@ -124,6 +125,7 @@ public class WorldInput : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
+            Debug.Log($"{controlled} {predBody}");
             if (controlled == null && predBody != null)
                 EnterControlledBody(predBody);
             else if (controlled != null)

@@ -5645,7 +5645,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.1195304, z: 0, w: 0.9928306}
   m_LocalPosition: {x: 0, y: 0, z: -4.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -30307,13 +30307,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726016462}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -4.05}
+  m_LocalRotation: {x: 0, y: 0.1195304, z: 0, w: 0.9928306}
+  m_LocalPosition: {x: 0, y: 0, z: -4.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1808888516}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 13.73, z: 0}
 --- !u!114 &726016464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35233,8 +35233,8 @@ GameObject:
   m_Component:
   - component: {fileID: 758942092}
   - component: {fileID: 758942095}
-  - component: {fileID: 758942094}
-  - component: {fileID: 758942093}
+  - component: {fileID: 758942097}
+  - component: {fileID: 758942096}
   m_Layer: 0
   m_Name: 3thCamera
   m_TagString: Untagged
@@ -35251,67 +35251,12 @@ Transform:
   m_GameObject: {fileID: 758942091}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.45000002, z: -2}
+  m_LocalPosition: {x: 0, y: -0.29, z: -4.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1808888516}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &758942093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758942091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f38bda98361e1de48a4ca2bd86ea3c17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Composition:
-    ScreenPosition: {x: 0, y: 0}
-    DeadZone:
-      Enabled: 0
-      Size: {x: 0.2, y: 0.2}
-    HardLimits:
-      Enabled: 0
-      Size: {x: 0.8, y: 0.8}
-      Offset: {x: 0, y: 0}
-  CenterOnActivate: 1
-  TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 0.5, y: 0.5}
-  Lookahead:
-    Enabled: 0
-    Time: 0
-    Smoothing: 0
-    IgnoreY: 0
---- !u!114 &758942094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758942091}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 625c14eee3ad46c99df7c7c891ef668a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Damping: {x: 0.1, y: 0.5, z: 0.1}
-  ShoulderOffset: {x: 0, y: 0, z: 0}
-  VerticalArmLength: 0.4
-  CameraSide: 1
-  CameraDistance: 2
-  AvoidObstacles:
-    Enabled: 0
-    CollisionFilter:
-      serializedVersion: 2
-      m_Bits: 1
-    IgnoreTag: 
-    CameraRadius: 0.2
-    DampingIntoCollision: 0
-    DampingFromCollision: 0.5
+  m_LocalEulerAnglesHint: {x: 0, y: 0.15, z: 0}
 --- !u!114 &758942095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35333,7 +35278,7 @@ MonoBehaviour:
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1730603711}
-    LookAtTarget: {fileID: 0}
+    LookAtTarget: {fileID: 8579015}
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 40
@@ -35355,6 +35300,61 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!114 &758942096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758942091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38bda98361e1de48a4ca2bd86ea3c17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Composition:
+    ScreenPosition: {x: 0.0011940598, y: 0}
+    DeadZone:
+      Enabled: 1
+      Size: {x: 0.2, y: 0.2}
+    HardLimits:
+      Enabled: 1
+      Size: {x: 0.8, y: 0.8}
+      Offset: {x: 0, y: 0}
+  CenterOnActivate: 1
+  TargetOffset: {x: 0, y: 0, z: 0}
+  Damping: {x: 0.5, y: 0.5}
+  Lookahead:
+    Enabled: 0
+    Time: 0
+    Smoothing: 0
+    IgnoreY: 0
+--- !u!114 &758942097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758942091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 625c14eee3ad46c99df7c7c891ef668a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damping: {x: 0.1, y: 0, z: 0.3}
+  ShoulderOffset: {x: 0, y: 0, z: 0}
+  VerticalArmLength: 0
+  CameraSide: 1
+  CameraDistance: 5
+  AvoidObstacles:
+    Enabled: 0
+    CollisionFilter:
+      serializedVersion: 2
+      m_Bits: 1
+    IgnoreTag: 
+    CameraRadius: 0.2
+    DampingIntoCollision: 0
+    DampingFromCollision: 0.5
 --- !u!1 &769421983
 GameObject:
   m_ObjectHideFlags: 0
@@ -45634,37 +45634,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1195975852}
   m_Mesh: {fileID: 2510989241636810379, guid: 43f63c731044e1f4291fec466547a940, type: 3}
---- !u!1 &1276240847
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1276240848}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1276240848
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1276240847}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4158192, y: 2.2942379, z: -0.3398183}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1279990492
 GameObject:
   m_ObjectHideFlags: 0
@@ -50762,7 +50731,6 @@ GameObject:
   - component: {fileID: 1730603712}
   - component: {fileID: 1730603709}
   - component: {fileID: 1730603708}
-  - component: {fileID: 1730603715}
   m_Layer: 0
   m_Name: Copter
   m_TagString: Untagged
@@ -50832,7 +50800,7 @@ Transform:
   m_GameObject: {fileID: 1730603707}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.29, z: 0}
+  m_LocalPosition: {x: 0, y: -0.29, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -50870,8 +50838,8 @@ Rigidbody:
   m_GameObject: {fileID: 1730603707}
   serializedVersion: 4
   m_Mass: 10
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 2
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -50910,65 +50878,38 @@ MonoBehaviour:
     m11: {fileID: 8579017}
   forwardAxis: {x: 0, y: 0, z: 1}
   rightAxis: {x: 1, y: 0, z: 0}
-  altitudePID:
-    kp: 1
-    ki: 0.1
-    kd: 0.5
+  maxAcceleration: 16
+  <altitudePID>k__BackingField:
+    <kp>k__BackingField: 1
+    <ki>k__BackingField: 0.1
+    <kd>k__BackingField: 0.2
     <integral>k__BackingField: 0
     <prevError>k__BackingField: 0
-  yawPID:
-    kp: 2
-    ki: 1
-    kd: 0.2
+  <yawPID>k__BackingField:
+    <kp>k__BackingField: 10
+    <ki>k__BackingField: 0
+    <kd>k__BackingField: 2
     <integral>k__BackingField: 0
     <prevError>k__BackingField: 0
-  posPitchPID:
-    kp: 0.5
-    ki: 0
-    kd: 0.1
+  <velPitchPID>k__BackingField:
+    <kp>k__BackingField: 100
+    <ki>k__BackingField: 0
+    <kd>k__BackingField: 20
     <integral>k__BackingField: 0
     <prevError>k__BackingField: 0
-  posRollPID:
-    kp: 0.5
-    ki: 0
-    kd: 0.1
+  <velRollPID>k__BackingField:
+    <kp>k__BackingField: 100
+    <ki>k__BackingField: 0
+    <kd>k__BackingField: 20
     <integral>k__BackingField: 0
     <prevError>k__BackingField: 0
-  velPitchPID:
-    kp: 1
-    ki: 0
-    kd: 0.1
-    <integral>k__BackingField: 0
-    <prevError>k__BackingField: 0
-  velRollPID:
-    kp: 1
-    ki: 0
-    kd: 0.1
-    <integral>k__BackingField: 0
-    <prevError>k__BackingField: 0
-  maxAngle: 30
-  correctionFactor: 1
-  damping: 0.1
-  IsTest: 0
+  <maxAngle>k__BackingField: 30
+  <correctionFactor>k__BackingField: 0.005
+  <damping>k__BackingField: 0.1
   throttle: 0
   pitchCorrection: 0
   rollCorrection: 0
   yawCorrection: 0
---- !u!114 &1730603715
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1730603707}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd7824511102bdd45a4d2c1c543a26dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  quadcopter: {fileID: 1730603714}
-  enableLogging: 1
-  logFileName: quadcopter_log.csv
 --- !u!1 &1808888515
 GameObject:
   m_ObjectHideFlags: 0
@@ -50999,8 +50940,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330585546}
-  - {fileID: 758942092}
   - {fileID: 726016463}
+  - {fileID: 758942092}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1890387798
@@ -60975,4 +60916,3 @@ SceneRoots:
   - {fileID: 789242344}
   - {fileID: 1305902276}
   - {fileID: 992458566}
-  - {fileID: 1276240848}

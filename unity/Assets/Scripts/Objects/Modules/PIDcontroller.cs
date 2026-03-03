@@ -11,7 +11,7 @@ public class PIDController
     [field: SerializeField, Group("Main"), Tab("Const")] public float ki { get; private set; }
     [field: SerializeField, Group("Main"), Tab("Const")] public float kd { get; private set; }
     [field: SerializeField, Group("Main"), Tab("Realtime"), ReadOnly] public float integral { get; private set; }
-    [field: SerializeField, Group("Main"), Tab("Realtime"), ReadOnly] public float prevError { get; private set; }
+    [field: SerializeField, Group("Main"), Tab("Realtime"), ReadOnly] public float prevError { get; set; }
     public PIDController(float kp, float ki, float kd)
     {
         this.kp = kp;

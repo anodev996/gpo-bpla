@@ -11,37 +11,30 @@ public class Quadcopter : ControlledBody
     [ShowInInspector, Group("Main"), Tab("Quadcopter"), ReadOnly] protected Matrix2x2 movement;
     [SerializeField, Group("Main"), Tab("Quadcopter")] private Vector3 forwardAxis = Vector3.forward;
     [SerializeField, Group("Main"), Tab("Quadcopter")] private Vector3 rightAxis = Vector3.right;
+    [SerializeField] private float maxAcceleration = 8f;
 
     // PID регуляторы для высоты и рыскания (остаются)
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController altitudePID { get; private set; }
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController yawPID { get; private set; }
 
-    // Каскадное управление горизонтальным движением
-    [field: SerializeField, Group("Main"), Tab("PID")] public PIDController posPitchPID { get; private set; }
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController velPitchPID { get; private set; }
-    [field: SerializeField, Group("Main"), Tab("PID")] public PIDController posRollPID { get; private set; }
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController velRollPID { get; private set; }
 
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float maxAngle { get; private set; } = 30f;
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float correctionFactor { get; private set; } = 1f;
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float damping { get; private set; } = 0.1f;
-    [SerializeField] private bool IsTest;
     protected override void OnEnable()
     {
         base.OnEnable();
-        targetPosition = new Vector3(1, 1, 1);
-        Time.timeScale = 0.4f;
+        targetPosition = transform.position;
     }
     private Vector3 upAxis => Vector3.Cross(forwardAxis, rightAxis).normalized;
     public float throttle, pitchCorrection, rollCorrection, yawCorrection;
-    protected override void Update()
+    protected override void FixedUpdate()
     {
-        base.Update();
-        if(IsTest)
-            TestMotors(throttle, pitchCorrection, rollCorrection, yawCorrection);
-        else
-            UpdateMovement(direction, angle);
+        base.FixedUpdate();
 
+        UpdateMovement(direction, angle);
         // Применяем нагрузку к моторам
         for (int x = 0; x < 2; x++)
             for (int y = 0; y < 2; y++)
@@ -65,8 +58,9 @@ public class Quadcopter : ControlledBody
     /// <param name="angle">Целевой угол рысканья (в градусах).</param>
     private void UpdateMovement(Vector3 direction, float angle)
     {
-        float dt = Time.deltaTime;
-
+        float dt = Time.fixedDeltaTime;
+        targetPosition += direction * dt;
+        targetYaw += angle;
         // --- Текущее состояние ---
         Vector3 currentPos = transform.position;
         float currentYaw = transform.eulerAngles.y;
@@ -95,23 +89,13 @@ public class Quadcopter : ControlledBody
         float angularRoll = Vector3.Dot(localAngularVel, forwardAxis);
         float angularYaw = Vector3.Dot(localAngularVel, upAxis);
 
-        // --- 1. Управление высотой (без изменений) ---
+        // Управление высотой
         throttle = altitudePID.Update(errorHeight, dt) - upSpeed * damping;
         throttle = Mathf.Clamp(throttle, 0f, 1f);
-
-        // --- 2. Каскадное управление горизонтальным положением ---
-        // Внешний контур: позиция -> желаемая локальная скорость
-        float desiredForwardSpeed = posPitchPID.Update(errorForward, dt);
-        float desiredRightSpeed = posRollPID.Update(errorRight, dt);
-
-        // Ограничиваем желаемую скорость (по желанию, можно добавить параметр maxSpeed)
-        float maxSpeed = 2f; // пример, можно вынести в инспектор
-        desiredForwardSpeed = Mathf.Clamp(desiredForwardSpeed, -maxSpeed, maxSpeed);
-        desiredRightSpeed = Mathf.Clamp(desiredRightSpeed, -maxSpeed, maxSpeed);
-
+        // Внешний контур по позиции (Пока что удален, я типо хз возможно будем его использовать в автоРежиме)
         // Внутренний контур: ошибка скорости -> желаемый угол наклона
-        float errorForwardSpeed = desiredForwardSpeed - forwardSpeed;
-        float errorRightSpeed = desiredRightSpeed - rightSpeed;
+        float errorForwardSpeed = direction.x - forwardSpeed;
+        float errorRightSpeed = direction.z - rightSpeed;
 
         float desiredPitch = velPitchPID.Update(errorForwardSpeed, dt);
         float desiredRoll = velRollPID.Update(errorRightSpeed, dt);
@@ -120,16 +104,13 @@ public class Quadcopter : ControlledBody
         desiredPitch = Mathf.Clamp(desiredPitch, -maxAngle, maxAngle);
         desiredRoll = Mathf.Clamp(desiredRoll, -maxAngle, maxAngle);
 
-        // --- 3. Управление рысканием (без изменений) ---
-        yawCorrection = yawPID.Update(errorYaw, dt) - angularYaw * damping;
+        // Управление рысканием
+        yawCorrection = -yawPID.Update(errorYaw, dt) * correctionFactor + angularYaw * damping;
         yawCorrection = Mathf.Clamp(yawCorrection, -1f, 1f);
 
-        // --- 4. Преобразование углов в коррекции моторов ---
+        // Преобразование углов в коррекции моторов
         pitchCorrection = desiredPitch * correctionFactor - angularPitch * damping;
-        rollCorrection = desiredRoll * correctionFactor - angularRoll * damping;
-
-        yawCorrection = 0;
-        rollCorrection = 0;
+        rollCorrection = desiredRoll * correctionFactor + angularRoll * damping;
 
         // --- Миксер X-конфигурации ---
         movement[0, 0] = throttle + pitchCorrection + rollCorrection - yawCorrection; // левый передний
