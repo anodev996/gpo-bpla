@@ -114,6 +114,7 @@ public class Wing : ComponentBody
     {
         float rotationSpeed = 2 * Mathf.PI * frequency; // рад/с
         angleStep = rotationSpeed * Time.fixedDeltaTime * Mathf.Rad2Deg;
+
         for (int i = 0; i < count; i++)
         {
             visualizeWinds[i].transform.Rotate(0, angleStep, 0);

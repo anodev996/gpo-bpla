@@ -11,7 +11,7 @@ public class Battery : ControlledBodyModule
     [SerializeField] private float maxCapacity;
     [InfoBox("Внутреннее сопротивление батарейки")]
     [field:SerializeField] public override float resistance { get; protected set; }
-    public override float currentVoltage
+    [ShowInInspector, ReadOnly] public override float currentVoltage
     {
         get 
         {

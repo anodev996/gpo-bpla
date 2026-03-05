@@ -28,9 +28,9 @@ public abstract class ControlledBody : Body
         ShutdownModules();
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
-        base.Update();
+        base.FixedUpdate();
         UpdateModules();
     }
 
@@ -121,8 +121,8 @@ public abstract class ControlledBody : Body
         ///Все батарейки считаются парарельно соединенными
         for (int i = 0; i < ProducersModules.Length; i++)
         {
-            Vbat += ProducersModules[i].maxVoltage;
-            Ibat += ProducersModules[i].maxAmperage;
+            Vbat += ProducersModules[i].currentVoltage;
+            Ibat += ProducersModules[i].currentAmperage;
             Rbat += (1 / ProducersModules[i].resistance);
         }
         Rbat = 1 / Rbat;

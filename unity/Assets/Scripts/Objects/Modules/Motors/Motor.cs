@@ -26,7 +26,9 @@ public class Motor : ControlledBodyModule
     {
         get
         {
-            return MaxRPM * (needAmperage / maxAmperage);
+            if (Mathf.Abs(currentAmperage - needAmperage) < (maxAmperage * 0.2f))
+                return MaxRPM * (needAmperage / maxAmperage);
+            return MaxRPM * (currentAmperage / maxAmperage);
         }
     }
     public override float needAmperage { get; set; }

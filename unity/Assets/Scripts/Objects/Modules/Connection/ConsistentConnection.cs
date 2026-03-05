@@ -47,12 +47,19 @@ public class ConsistentConnection : ControlledBodyModule, IConnection
             float I = 0;
             for (int i = 0; i < modules.Length; i++)
                 I += modules[i].currentAmperage;
-            return I / modules.Length;
+            return I;
         }
         set
         {
-            for(int i = 0; i < modules.Length;i++)
-                modules[i].currentAmperage = value;
+            var c = 0f;
+            if (needAmperage == 0)
+                c = 0f;
+            else
+                c = value / needAmperage;
+            for (int i = 0; i < modules.Length; i++)
+            {
+                modules[i].currentAmperage = c * modules[i].needAmperage;
+            }
         } 
     }
     public override float currentVoltage
@@ -62,7 +69,7 @@ public class ConsistentConnection : ControlledBodyModule, IConnection
             var v = 0f;
             for (int i = 0; i < modules.Length; i++)
                 v += modules[i].currentVoltage;
-            return v;
+            return v / modules.Length;
         }
         set
         {
@@ -75,12 +82,35 @@ public class ConsistentConnection : ControlledBodyModule, IConnection
             float c = Mathf.Clamp01(rv / v);
             for(int i = 0;i < modules.Length;i++)
             {
-                modules[i].currentVoltage = c * modules[i].currentVoltage;
+                modules[i].currentVoltage = c * modules[i].needVoltage;
             }
         }
     }
-
-
+    public override float needAmperage
+    {
+        get
+        {
+            float I = 0;
+            for (int i = 0; i < modules.Length; i++)
+                I += modules[i].needAmperage;
+            return I;
+        }
+        set
+        {
+            for (int i = 0; i < modules.Length; i++)
+                modules[i].needAmperage = value;
+        }
+    }
+    public override float needVoltage
+    {
+        get
+        {
+            var v = 0f;
+            for (int i = 0; i < modules.Length; i++)
+                v += modules[i].needVoltage;
+            return v / modules.Length;
+        }
+    }
     public override void OnStart(ControlledBody body)
     {
         base.OnStart(body);

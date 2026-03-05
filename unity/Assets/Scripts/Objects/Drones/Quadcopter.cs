@@ -33,7 +33,6 @@ public class Quadcopter : ControlledBody
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-
         UpdateMovement(direction, angle);
         // Применяем нагрузку к моторам
         for (int x = 0; x < 2; x++)

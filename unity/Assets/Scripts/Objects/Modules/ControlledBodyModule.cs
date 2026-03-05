@@ -26,7 +26,7 @@ public abstract class ControlledBodyModule : MonoBehaviour
         }
         set { }
     }
-    public virtual float needVoltage
+    [ReadOnly][ShowInInspector]public virtual float needVoltage
     {
         get
         {
@@ -34,8 +34,8 @@ public abstract class ControlledBodyModule : MonoBehaviour
         }
         protected set { }
     }
-    public virtual float currentAmperage { get; set; }
-    public virtual float currentVoltage { get; set; }
+    [ReadOnly][ShowInInspector]public virtual float currentAmperage { get; set; }
+    [ReadOnly][ShowInInspector]public virtual float currentVoltage { get; set; }
     /// <summary>
     /// Сопротивление это стандартная величина, 
     /// на нее влияют только максимальные параметры, 
