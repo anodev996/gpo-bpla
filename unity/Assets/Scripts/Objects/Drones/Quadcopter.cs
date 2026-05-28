@@ -19,7 +19,8 @@ public class Quadcopter : ControlledBody
 
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController velPitchPID { get; private set; }
     [field: SerializeField, Group("Main"), Tab("PID")] public PIDController velRollPID { get; private set; }
-
+    [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float maxVelocity { get; private set; } = 1;
+    [field: ShowInInspector, ReadOnly, Group("Main"), Tab("Quadcopter")] private float currentMaxVelocity;
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float maxAngle { get; private set; } = 30f;
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float correctionFactor { get; private set; } = 1f;
     [field: SerializeField, Group("Main"), Tab("Quadcopter")] public float damping { get; private set; } = 0.1f;
@@ -30,10 +31,15 @@ public class Quadcopter : ControlledBody
     }
     private Vector3 upAxis => Vector3.Cross(forwardAxis, rightAxis).normalized;
     public float throttle, pitchCorrection, rollCorrection, yawCorrection;
+
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        UpdateMovement(direction, angle);
+
+        currentMaxVelocity = Mathf.Lerp(currentMaxVelocity, direction.magnitude * maxVelocity, Time.fixedDeltaTime);
+        currentMaxVelocity = Mathf.Clamp(currentMaxVelocity, 1, maxVelocity);
+        UpdateMovement(direction * currentMaxVelocity, angle);
         // Применяем нагрузку к моторам
         for (int x = 0; x < 2; x++)
             for (int y = 0; y < 2; y++)

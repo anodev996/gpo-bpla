@@ -50668,7 +50668,7 @@ Rigidbody:
   m_GameObject: {fileID: 1730603707}
   serializedVersion: 4
   m_Mass: 10
-  m_Drag: 5
+  m_Drag: 0.5
   m_AngularDrag: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -50733,6 +50733,7 @@ MonoBehaviour:
     <kd>k__BackingField: 20
     <integral>k__BackingField: 0
     <prevError>k__BackingField: 0
+  <maxVelocity>k__BackingField: 3
   <maxAngle>k__BackingField: 30
   <correctionFactor>k__BackingField: 0.005
   <damping>k__BackingField: 0.1
